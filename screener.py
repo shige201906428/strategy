@@ -53,32 +53,29 @@ def calculate_supertrend(df, period=10, multiplier=4.5):
     tr3 = pd.DataFrame(abs(low - close.shift(1)))
     frames = [tr1, tr2, tr3]
     tr = pd.concat(frames, axis=1, join='inner').max(axis=1)
-    atr = tr.ewm(alpha=1/period, adjust=False).mean() # Pineのta.atrと同様のEMA/RMAベース
+    atr = tr.ewm(alpha=1/period, adjust=False).mean()
     
     hl2 = (high + low) / 2
     final_upperband = hl2 + multiplier * atr
     final_lowerband = hl2 - multiplier * atr
     
     supertrend = np.zeros(len(df))
-    direction = np.zeros(len(df)) # -1: Green(Up), 1: Red(Down)
+    direction = np.zeros(len(df))
     
     for i in range(1, len(df)):
-        # Upper Bandの調整
         if close.iloc[i-1] < final_upperband.iloc[i-1]:
             final_upperband.iloc[i] = min(final_upperband.iloc[i], final_upperband.iloc[i-1])
-        # Lower Bandの調整
         if close.iloc[i-1] > final_lowerband.iloc[i-1]:
             final_lowerband.iloc[i] = max(final_lowerband.iloc[i], final_lowerband.iloc[i-1])
             
-        # トレンド方向の判定
         if direction[i-1] == 1 or direction[i-1] == 0:
             if close.iloc[i] > final_upperband.iloc[i]:
-                direction[i] = -1 # Green転換
+                direction[i] = -1
             else:
                 direction[i] = 1
         else:
             if close.iloc[i] < final_lowerband.iloc[i]:
-                direction[i] = 1 # Red転換
+                direction[i] = 1
             else:
                 direction[i] = -1
                 
@@ -92,7 +89,6 @@ def check_trend_strategy(ticker_list, sma_len=100, st_len=10, st_mult=4.5):
     """王道転換ストラテジーの条件に合致するか判定する"""
     results = []
     end_date = datetime.date.today()
-    # 100日SMAと10日ATRを計算するため、約1.5年分以上のデータを取得
     start_date = end_date - datetime.timedelta(days=365 * 2)
 
     print(f"\nYahoo Financeから全株価データを一括ダウンロード中...")
@@ -111,11 +107,9 @@ def check_trend_strategy(ticker_list, sma_len=100, st_len=10, st_mult=4.5):
             if len(df) < sma_len + 10:
                 continue
 
-            # 指標の計算
             df['SMA_Long'] = df['Close'].rolling(window=sma_len).mean()
             df = calculate_supertrend(df, period=st_len, multiplier=st_mult)
 
-            # 直近データ（今日＝インデックス-1、昨日＝インデックス-2）
             c_close = df['Close'].iloc[-1]
             c_sma = df['SMA_Long'].iloc[-1]
             c_dir = df['ST_Direction'].iloc[-1]
@@ -125,17 +119,13 @@ def check_trend_strategy(ticker_list, sma_len=100, st_len=10, st_mult=4.5):
             p_dir = df['ST_Direction'].iloc[-2]
             p_st = df['Supertrend'].iloc[-2]
 
-            # 100日線の上（大局の上昇相場）
             is_bull_market = c_close > c_sma
 
             if is_bull_market:
                 signal_type = ""
                 
-                # 1. 初動エントリー (昨日が赤[1]で、今日が緑[-1]に転換)
                 if p_dir == 1 and c_dir == -1:
                     signal_type = "初動 (ST転換)"
-                
-                # 2. 押し目買い (緑期間中、かつ昨日終値がST以下で今日終値がSTを上抜け)
                 elif c_dir == -1 and p_close <= p_st and c_close > c_st:
                     signal_type = "押し目 (ST上抜け)"
 
@@ -162,11 +152,10 @@ def generate_html_report(df, output_path, title_suffix=""):
         ticker = row['Ticker']
         sig_type = row['Signal_Type']
         
-        # フラグ（シグナル）に応じたバッジ色分け
         if "初動" in sig_type:
-            badge_color = "badge-danger"  # 初動は目立つ赤
+            badge_color = "badge-danger"
         else:
-            badge_color = "badge-warning" # 押し目はオレンジ/黄
+            badge_color = "badge-warning"
             
         if ".T" in ticker:
             code = ticker.split('.')[0]
@@ -295,7 +284,6 @@ if __name__ == "__main__":
         print("対象ティッカーがありません。")
         exit()
 
-    # ストラテジーの実行 (SMA=100, ATR=10, Mult=4.5)
     result_df = check_trend_strategy(tickers, sma_len=100, st_len=10, st_mult=4.5)
     html_name = "index.html"
     
