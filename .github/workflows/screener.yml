@@ -1,4 +1,4 @@
-name: Run 52-Week High Screener
+name: Run Trend Reversal Screener
 
 on:
   schedule:
@@ -11,29 +11,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-type: '3.x'
-        python-version: '3.10'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-type: '3.x'
+          python-version: '3.10'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pandas yfinance tqdm lxml rows
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas yfinance tqdm lxml rows numpy
 
-    - name: Run screener
-      env:
-        SCREENER_CHOICE: "3" # 1: S&P500, 2: TOPIX, 3: 両方
-      run: |
-        python screener.py
+      - name: Run screener
+        env:
+          SCREENER_CHOICE: "3" # 1: S&P500, 2: TOPIX, 3: 両方
+        run: |
+          python screener.py
 
-    - name: Commit and Push changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add index.html
-        git diff --cached --quiet || (git commit -m "Update 52-week high report with counts" && git push)
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add index.html
+          git diff --cached --quiet || (git commit -m "Update trend reversal strategy report with flags" && git push)
