@@ -2,9 +2,14 @@ name: Run Trend Reversal Screener
 
 on:
   schedule:
-    # 毎日日本時間の朝に自動実行（必要に応じて調整してください）
+    # 毎日日本時間の朝に自動実行
     - cron: '0 22 * * *'
   workflow_dispatch: # 手動実行ボタン用
+
+# ─── ここから追加 ───
+permissions:
+  contents: write
+# ─── ここまで追加 ───
 
 jobs:
   build:
