@@ -145,7 +145,9 @@ def check_trend_strategy(ticker_list, sma_len=100, st_len=10, st_mult=4.5):
 
 def generate_html_report(df, output_path, title_suffix=""):
     """index.htmlとして概要・チャート両方のリンク付きレポートを出力する"""
-    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # GitHub Actions環境(UTC)を考慮し、明示的に日本時間(+9時間)を計算
+    jst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+    now_str = jst_now.strftime("%Y-%m-%d %H:%M:%S (JST)")
 
     table_rows = ""
     for idx, row in df.iterrows():
