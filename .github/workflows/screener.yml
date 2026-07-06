@@ -33,7 +33,7 @@ jobs:
         env:
           SCREENER_CHOICE: "3" # S&P500 と TOPIX の両方を実行
         run: |
-          python main.py # ※スクリプトのファイル名が異なる場合はここを修正してください
+          python screener.py # ※スクリプトのファイル名が異なる場合はここを修正してください
 
       # 5. 生成された index.html をリポジトリにプッシュ
       - name: Commit and push changes
