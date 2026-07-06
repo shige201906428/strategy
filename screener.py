@@ -119,7 +119,7 @@ def calculate_supertrend(df, period=10, multiplier=4.5):
     df['ST_Direction'] = direction
     return df
 
-def check_trend_strategy(ticker_list, sma_len=100, st_len=10, st_mult=4.5):
+def check_trend_strategy(ticker_list, sma_len=100, st_len=10, st_mult=4.0):
     """王道転換ストラテジーの条件に合致するか判定する"""
     results = []
     end_date = datetime.date.today()
