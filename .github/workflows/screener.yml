@@ -4,8 +4,8 @@ on:
   # 手動実行用
   workflow_dispatch:
   # 定期実行用（必要に応じてコメントアウトを解除してください）
-  # schedule:
-  #   - cron: '0 23 * * 1-5' # 日本時間 月〜金の朝8:00
+  schedule:
+    - cron: '0 20 * * *' # 日本時間の毎日朝5:00に自動実行
 
 jobs:
   build:
